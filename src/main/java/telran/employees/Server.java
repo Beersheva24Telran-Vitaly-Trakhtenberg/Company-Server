@@ -12,6 +12,7 @@ public class Server
     private volatile Company company = new CompanyImpl();
     public final int PORT = 3500;
     private volatile boolean data_changed = false;
+    private PlainFile plain_file = new PlainFile();
 
 
     public static void main(String[] args) {
@@ -23,10 +24,11 @@ public class Server
         if (this.company instanceof Persistable persistable_company) {
             try {
                 CompanyOperations company_operations = new CompanyOperations(this);
-                company_operations.restoreCompany();
 
                 Thread thread_operations = new Thread(company_operations);
-                Thread thread_storage = new Thread(new PlainFile(this));
+                //Thread thread_storage = new Thread(new PlainFile(this));
+
+                thread_operations.start();
             } catch (Exception e) {
                 e.printStackTrace();
             }
