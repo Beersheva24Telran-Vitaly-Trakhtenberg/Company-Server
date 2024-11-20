@@ -3,7 +3,7 @@ package telran.employees.storages;
 import java.io.File;
 import java.nio.file.Paths;
 
-public class PlainFile
+public class PlainFile implements Runnable
 {
     private final String FILE_NAME;
     private final String DIRECTORY_NAME;
@@ -33,4 +33,8 @@ public class PlainFile
         return res;
     }
 
+    @Override
+    public void run() {
+
+    }
 }
