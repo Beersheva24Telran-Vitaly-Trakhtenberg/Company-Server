@@ -1,9 +1,13 @@
 package telran.employees.storages;
 
+import telran.employees.Company;
+import telran.employees.CompanyImpl;
+import telran.employees.StorageOperations;
+
 import java.io.File;
 import java.nio.file.Paths;
 
-public class PlainFile implements Runnable
+public class PlainFile implements StorageOperations
 {
     private final String FILE_NAME;
     private final String DIRECTORY_NAME;
@@ -34,7 +38,19 @@ public class PlainFile implements Runnable
     }
 
     @Override
-    public void run() {
+    public void save(Company company) {
+        ((CompanyImpl) company).saveToFile(getFilePath());
+    }
 
+    @Override
+    public Company load()
+    {
+        Company company = new CompanyImpl();
+        String file_path = getFilePath();
+        if (file_path != null) {
+            ((CompanyImpl) company).restoreFromFile(file_path);
+        }
+
+        return company;
     }
 }
