@@ -2,21 +2,16 @@ package telran.employees;
 
 import telran.employees.storages.PlainFile;
 import telran.io.Persistable;
-import telran.net.Protocol;
-import telran.net.Response;
-
-import static telran.net.ResponseCode.*;
 
 public class Server
 {
     private volatile Company company = new CompanyImpl();
     public final int PORT = 3500;
     private volatile boolean data_changed = false;
-    private PlainFile plain_file = new PlainFile();
 
 
     public static void main(String[] args) {
-        Server server_controller = new Server();
+
     }
 
     private Server() {
@@ -30,9 +25,9 @@ public class Server
 
                 // FixMe: add shutdown hook to save company to file
 /*
-                PersistableSaverThread saverThread = new PersistableSaverThread(persistable, FILE_NAME, TIME_INTERVAL);
+                PersistableSaverThread saverThread = new PersistableSaverThread(persistable_company, FILE_NAME, TIME_INTERVAL);
                 saverThread.start();
-                Runtime.getRuntime().addShutdownHook(new Thread(() -> persistable.saveToFile(FILE_NAME)));
+                Runtime.getRuntime().addShutdownHook(new Thread(() -> persistable_company.saveToFile(FILE_NAME)));
 */
 
                 thread_operations.start();
