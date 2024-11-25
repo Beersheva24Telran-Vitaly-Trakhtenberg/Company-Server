@@ -28,6 +28,13 @@ public class Server
                 Thread thread_operations = new Thread(company_operations);
                 //Thread thread_storage = new Thread(new PlainFile(this));
 
+                // FixMe: add shutdown hook to save company to file
+/*
+                PersistableSaverThread saverThread = new PersistableSaverThread(persistable, FILE_NAME, TIME_INTERVAL);
+                saverThread.start();
+                Runtime.getRuntime().addShutdownHook(new Thread(() -> persistable.saveToFile(FILE_NAME)));
+*/
+
                 thread_operations.start();
             } catch (Exception e) {
                 e.printStackTrace();
