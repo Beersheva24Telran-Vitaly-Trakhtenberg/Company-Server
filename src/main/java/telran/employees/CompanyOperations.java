@@ -1,55 +1,61 @@
 package telran.employees;
 import telran.employees.storages.PlainFile;
 import telran.io.Persistable;
-import telran.net.Protocol;
-import telran.net.Response;
-import telran.net.TCPServer;
-
-import java.util.Arrays;
+import telran.net.*;
 
 import static telran.net.ResponseCode.*;
 
-public class CompanyOperations implements Runnable
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.util.Arrays;
+
+public class CompanyOperations implements Runnable, Protocol
 {
     private final Server server;
 
-    private final Protocol PROTOCOL = request -> {
-        Response response;
-        if (request.requestType() != null) {
-            response = switch (request.requestType().toLowerCase()) {
-                case "hire_employee" -> hireEmployee(request.requestData());
-                case "hire_wage_employee" -> hireWageEmployee(request.requestData());
-                case "hire_sales_person" -> hireSalesPerson(request.requestData());
-                case "hire_manager" -> hireManager(request.requestData());
-                case "fire_employee" -> fireEmployee(request.requestData());
-                case "get_employees" -> getEmployees(request.requestData());
-                case "get_employee_by_id" -> getEmployeeById(request.requestData());
-                case "get_employees_by_department" -> getEmployeesByDepartment(request.requestData());
-                case "get_employees_by_age" -> getEmployeesByAge(request.requestData());
-                case "get_department_salary_budget" -> getDepartmentSalaryBudget(request.requestData());
-                case "get_departments_list" -> getDepartmentsList(request.requestData());
-                case "get_managers_most_factors" -> getManagersMostFactors(request.requestData());
-                default -> new Response(WRONG_REQUEST, String.format("Wrong request type: %s", request.requestType()));
-            };
-        } else {
-            response = new Response(WRONG_DATA, "Wrong request data, null given");
+    private Response getManagersMostFactors(String s)
+    {
+        Response res;
+
+        try {
+            Company company = server.getCompany();
+            Manager[] managers = company.getManagersWithMostFactor();
+            res = new Response(SUCCESS, Arrays.toString(managers));
+        } catch (Exception e) {
+            res = new Response(INTERNAL_ERROR, e.getMessage());
         }
-        return response;
-    };
 
-    private static Response getManagersMostFactors(String s) {
-        // TODO Implement this method
-        throw new UnsupportedOperationException("Method CompanyOperations.getManagersMostFactors() not implemented yet");
+        return res;
     }
 
-    private static Response getDepartmentsList(String s) {
-        // TODO Implement this method
-        throw new UnsupportedOperationException("Method CompanyOperations.getDepartmentsList() not implemented yet");
+    private Response getDepartmentsList(String s)
+    {
+        Response res;
+
+        try {
+            Company company = server.getCompany();
+            String[] departments = company.getDepartments();
+            res = new Response(SUCCESS, Arrays.toString(departments));
+        } catch (Exception e) {
+            res = new Response(INTERNAL_ERROR, e.getMessage());
+        }
+
+        return res;
     }
 
-    private static Response getDepartmentSalaryBudget(String s) {
-        // TODO Implement this method
-        throw new UnsupportedOperationException("Method CompanyOperations.getDepartmentSalaryBudget() not implemented yet");
+    private Response getDepartmentSalaryBudget(String s)
+    {
+        Response res;
+
+        try {
+            Company company = server.getCompany();
+            int department_budget = company.getDepartmentBudget(s);
+            res = new Response(SUCCESS, department_budget+"");
+        } catch (Exception e) {
+            res = new Response(INTERNAL_ERROR, e.getMessage());
+        }
+
+        return res;
     }
 
     private static Response getEmployeesByAge(String s) {
@@ -57,24 +63,47 @@ public class CompanyOperations implements Runnable
         throw new UnsupportedOperationException("Method CompanyOperations.getEmployeesByAge() not implemented yet");
     }
 
-    private static Response getEmployeesByDepartment(String s) {
+    private Response getEmployeesByDepartment(String s)
+    {
         // TODO Implement this method
         throw new UnsupportedOperationException("Method CompanyOperations.getEmployeesByDepartment() not implemented yet");
     }
 
-    private static Response getEmployeeById(String s) {
-        // TODO Implement this method
-        throw new UnsupportedOperationException("Method CompanyOperations.getEmployeeById() not implemented yet");
+    private Response getEmployeeById(String s)
+    {
+        Response res;
+
+        try {
+            Company company = server.getCompany();
+            Employee employee = company.getEmployee(Long.getLong(s));
+            res = new Response(SUCCESS, employee.toString());
+        } catch (Exception e) {
+            res = new Response(INTERNAL_ERROR, e.getMessage());
+        }
+
+        return res;
     }
 
-    private static Response getEmployees(String s) {
+    private Response getEmployees(String s)
+    {
         // TODO Implement this method
         throw new UnsupportedOperationException("Method CompanyOperations.getEmployees() not implemented yet");
     }
 
-    private static Response fireEmployee(String s) {
-        // TODO Implement this method
-        throw new UnsupportedOperationException("Method CompanyOperations.fireEmployee() not implemented yet");
+    private Response fireEmployee(String s)
+    {
+        Response res;
+
+        try {
+            Company company = server.getCompany();
+            company.removeEmployee(Long.getLong(s));
+            res = new Response(SUCCESS, "Employee fired");
+            server.setDataChanged(true);
+        } catch (Exception e) {
+            res = new Response(INTERNAL_ERROR, e.getMessage());
+        }
+
+        return res;
     }
 
     private Response hireManager(String json_data)
@@ -86,6 +115,7 @@ public class CompanyOperations implements Runnable
             Manager employee = (Manager) Manager.getEmployeeFromJSON(json_data);
             company.addEmployee(employee);
             res = new Response(SUCCESS, "Manager added");
+            server.setDataChanged(true);
         } catch (Exception e) {
             res = new Response(INTERNAL_ERROR, e.getMessage());
         }
@@ -102,6 +132,7 @@ public class CompanyOperations implements Runnable
             SalesPerson employee = (SalesPerson) SalesPerson.getEmployeeFromJSON(json_data);
             company.addEmployee(employee);
             res = new Response(SUCCESS, "Sales Person added");
+            server.setDataChanged(true);
         } catch (Exception e) {
             res = new Response(INTERNAL_ERROR, e.getMessage());
         }
@@ -118,6 +149,7 @@ public class CompanyOperations implements Runnable
             WageEmployee employee = (WageEmployee) WageEmployee.getEmployeeFromJSON(json_data);
             company.addEmployee(employee);
             res = new Response(SUCCESS, "Wage Employee added");
+            server.setDataChanged(true);
         } catch (Exception e) {
             res = new Response(INTERNAL_ERROR, e.getMessage());
         }
@@ -134,6 +166,7 @@ public class CompanyOperations implements Runnable
             Employee employee = Employee.getEmployeeFromJSON(json_data);
             company.addEmployee(employee);
             res = new Response(SUCCESS, "Employee added");
+            server.setDataChanged(true);
         } catch (Exception e) {
             res = new Response(INTERNAL_ERROR, e.getMessage());
         }
@@ -148,7 +181,6 @@ public class CompanyOperations implements Runnable
     @Override
     public void run()
     {
-        boolean running = true;
         if (server.getCompany() instanceof Persistable persistable_company) {
             try {
                 if (server.getCompany() == null) {
@@ -158,22 +190,53 @@ public class CompanyOperations implements Runnable
                 e.printStackTrace();
             }
 
-            while(running) {
-                try {
-                    TCPServer tcp_server = new TCPServer(PROTOCOL, server.PORT);
-                    tcp_server.run();
-                } catch (Exception e) {
-                    System.out.println("Client closed connection abnormally");
-                    System.err.println(e.getMessage() + " \n " + Arrays.toString(e.getStackTrace()));
-                    running = false;
-                }
+            try {
+                TCPServer tcp_server = new TCPServer(this, server.PORT);
+                tcp_server.run();
+            } catch (Exception e) {
+                System.out.println("Client closed connection abnormally");
+                System.err.println(e.getMessage() + " \n " + Arrays.toString(e.getStackTrace()));
             }
-
         }
+    }
+
+    @Override
+    public Response getResponse(Request request)
+    {
+        String requestType = request.requestType();
+        String requestData = request.requestData();
+        Response response = null;
+        try {
+            Method method = CompanyOperations.class.getDeclaredMethod(requestType, String.class);
+            method.setAccessible(true);
+            response = (Response) method.invoke(this, requestData);
+        } catch (NoSuchMethodException e) {
+            response = new Response(ResponseCode.WRONG_REQUEST, requestType + " Wrong type");
+
+        } catch (InvocationTargetException e) {
+            Throwable causeExc = e.getCause();
+            String message = causeExc == null ? e.getMessage() : causeExc.getMessage();
+            response = new Response(ResponseCode.WRONG_DATA, message);
+        } catch (Exception e){
+            //Note: using only for shut down the Server and printing out Exception full stack
+            throw new RuntimeException(e);
+        }
+
+        return response;
+    }
+
+    Response getOkResponse(String responseData) {
+        return new Response(ResponseCode.SUCCESS, responseData);
     }
 
     private Company restoreCompany()
     {
         return new PlainFile().load();
+    }
+
+    private void saveCompany()
+    {
+        new PlainFile().save(server.getCompany());
+        server.setDataChanged(false);
     }
 }
