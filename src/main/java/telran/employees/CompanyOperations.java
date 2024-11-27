@@ -1,5 +1,5 @@
 package telran.employees;
-import telran.employees.storages.PlainFile;
+import telran.employees.storages.PlainFileStorage;
 import telran.io.Persistable;
 import telran.net.*;
 
@@ -231,12 +231,6 @@ public class CompanyOperations implements Runnable, Protocol
 
     private Company restoreCompany()
     {
-        return new PlainFile().load();
-    }
-
-    private void saveCompany()
-    {
-        new PlainFile().save(server.getCompany());
-        server.setDataChanged(false);
+        return new PlainFileStorage(server).load();
     }
 }

@@ -1,17 +1,21 @@
 package telran.employees;
 
-import telran.employees.storages.PlainFile;
+import telran.employees.storages.PlainFileStorage;
 import telran.io.Persistable;
 
 public class Server
 {
     private volatile Company company = new CompanyImpl();
+    private Storage storage;
+
+
     public final int PORT = 3500;
     private volatile boolean data_changed = false;
 
 
-    public static void main(String[] args) {
-
+    public static void main(String[] args)
+    {
+        new Server();
     }
 
     private Server() {
@@ -19,9 +23,10 @@ public class Server
         if (this.company instanceof Persistable persistable_company) {
             try {
                 CompanyOperations company_operations = new CompanyOperations(this);
+                storage = new StorageFactory().createStorage(this, "file");
 
                 Thread thread_operations = new Thread(company_operations);
-                //Thread thread_storage = new Thread(new PlainFile(this));
+                Thread thread_storage = new Thread((Runnable) storage);
 
                 // FixMe: add shutdown hook to save company to file
 /*
@@ -31,6 +36,7 @@ public class Server
 */
 
                 thread_operations.start();
+                thread_storage.start();
             } catch (Exception e) {
                 e.printStackTrace();
             }
