@@ -12,6 +12,7 @@ import java.util.Arrays;
 public class CompanyOperations implements Runnable, Protocol
 {
     private final Server server;
+    private final int port;
 
     private Response getManagersMostFactors(String s)
     {
@@ -174,8 +175,9 @@ public class CompanyOperations implements Runnable, Protocol
         return res;
     }
 
-    public CompanyOperations(Server server) {
+    public CompanyOperations(Server server, int port) {
         this.server = server;
+        this.port = port;
     }
 
     @Override
@@ -191,7 +193,7 @@ public class CompanyOperations implements Runnable, Protocol
             }
 
             try {
-                TCPServer tcp_server = new TCPServer(this, server.PORT);
+                TCPServer tcp_server = new TCPServer(this, this.port);
                 tcp_server.run();
             } catch (Exception e) {
                 System.out.println("Client closed connection abnormally");
