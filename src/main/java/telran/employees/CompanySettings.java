@@ -19,4 +19,10 @@ public class CompanySettings
     public final static long MAX_SALES = 99999;
     public final static double MIN_FACTOR = 0.1;
     public final static double MAX_FACTOR = 1.0;
+
+    public static void validateEmployeeID(long id) {
+        if (id < MIN_EMPLOYEE_ID || id > MAX_EMPLOYEE_ID) {
+            throw new IllegalArgumentException("Employee ID should be between " + MIN_EMPLOYEE_ID + " and " + MAX_EMPLOYEE_ID);
+        }
+    }
 }

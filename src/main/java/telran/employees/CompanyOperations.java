@@ -76,8 +76,12 @@ public class CompanyOperations implements Runnable, Protocol
 
         try {
             Company company = server.getCompany();
-            Employee employee = company.getEmployee(Long.getLong(s));
+            Long emlpoyee_id = Long.parseLong(s);
+            CompanySettings.validateEmployeeID(emlpoyee_id);
+            Employee employee = company.getEmployee(emlpoyee_id);
             res = new Response(SUCCESS, employee.toString());
+        } catch (NullPointerException e) {
+            res = new Response(NOT_FOUND, "No data for employee id: " + s);
         } catch (Exception e) {
             res = new Response(INTERNAL_ERROR, e.getMessage());
         }
@@ -97,7 +101,9 @@ public class CompanyOperations implements Runnable, Protocol
 
         try {
             Company company = server.getCompany();
-            company.removeEmployee(Long.getLong(s));
+            Long emlpoyee_id = Long.parseLong(s);
+            CompanySettings.validateEmployeeID(emlpoyee_id);
+            company.removeEmployee(emlpoyee_id);
             res = new Response(SUCCESS, "Employee fired");
             server.setDataChanged(true);
         } catch (Exception e) {
