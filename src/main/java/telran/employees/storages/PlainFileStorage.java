@@ -1,5 +1,6 @@
 package telran.employees.storages;
 
+import org.json.JSONObject;
 import telran.employees.*;
 
 import java.io.File;
@@ -11,16 +12,11 @@ public class PlainFileStorage extends CompanyStorage implements Runnable
     private final String FILE_NAME;
     private final String DIRECTORY_NAME;
 
-    public PlainFileStorage(String file_name, String directory_name, Server server)
+    public PlainFileStorage(JSONObject storage_settings, Server server)
     {
-        super(server);
-        this.FILE_NAME = file_name;
-        this.DIRECTORY_NAME = directory_name;
-    }
-
-    public PlainFileStorage(Server server)
-    {
-        this("employees.data", "CompanyData", server);
+        super(storage_settings, server);
+        this.FILE_NAME = storage_settings.getString("FILE_NAME");
+        this.DIRECTORY_NAME = storage_settings.getString("DIRECTORY_NAME");
     }
 
     public String getFilePath() throws IOException {

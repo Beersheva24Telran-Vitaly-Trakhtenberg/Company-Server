@@ -1,5 +1,6 @@
 package telran.employees;
 
+import org.json.JSONObject;
 import telran.employees.storages.PlainFileStorage;
 import telran.io.Persistable;
 
@@ -20,8 +21,14 @@ public class Server
     private Server(String storage_type) {
 
         if (this.company instanceof Persistable) {
+            Storage storage = null;
             try {
-                company = new PlainFileStorage(this).load();
+                JSONObject storage_settings = new JSONObject();
+                storage_settings.put("FILE_NAME", "employees.data");
+                storage_settings.put("DIRECTORY_NAME", "CompanyData");
+                storage = new StorageFactory().createStorage(storage_settings, this, storage_type);
+
+                company = storage.load();
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -33,7 +40,6 @@ public class Server
                     thread_operations.start();
                 }
 
-                Storage storage = new StorageFactory().createStorage(this, storage_type);
                 Thread thread_storage = new Thread((Runnable) storage);
                 thread_storage.start();
 

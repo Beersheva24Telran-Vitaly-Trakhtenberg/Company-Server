@@ -1,15 +1,21 @@
 package telran.employees;
 
+import org.json.JSONObject;
 import telran.employees.storages.PlainFileStorage;
 
 public class StorageFactory
 {
-    public static Storage createStorage(Server server, String type)
+    public static Storage createStorage(JSONObject storage_settings, Server server, String type)
     {
         Storage storage = null;
         switch (type) {
             case "file":
-                storage = new PlainFileStorage(server);
+                if (storage_settings == null) {
+                    storage_settings = new JSONObject();
+                    storage_settings.put("FILE_NAME", "employees.data");
+                    storage_settings.put("DIRECTORY_NAME", "CompanyData");
+                }
+                storage = new PlainFileStorage(storage_settings, server);
                 break;
             case "sql":
                 break;
@@ -20,5 +26,10 @@ public class StorageFactory
         }
 
         return storage;
+    }
+
+    public static Storage createStorage(Server server, String type)
+    {
+        return createStorage(null, server, type);
     }
 }

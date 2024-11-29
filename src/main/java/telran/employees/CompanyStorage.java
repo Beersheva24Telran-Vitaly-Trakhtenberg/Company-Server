@@ -1,12 +1,17 @@
 package telran.employees;
 
+import org.json.JSONObject;
+
 public class CompanyStorage implements Storage, Runnable
 {
     protected final Server server;
     protected final int TIME_INTERVAL = 1 * 60 * 1000;
+    protected final JSONObject storage_settings;
 
-    public CompanyStorage(Server server) {
+    public CompanyStorage(JSONObject storage_settings, Server server)
+    {
         this.server = server;
+        this.storage_settings = storage_settings;
     }
 
     /**
