@@ -68,4 +68,17 @@ public class CompanySettings
         }
     }
 
+    public static void validateDepartment(String department) {
+        boolean found = false;
+        for (String dep : DEPARTMENTS) {
+            if (dep.equals(department)) {
+                found = true;
+                break;
+            }
+        }
+        if (!found) {
+            throw new IllegalArgumentException("Unknown department: " + department);
+        }
+    }
+
 }
