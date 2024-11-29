@@ -1,40 +1,39 @@
 package telran.employees.storages;
 
-import telran.employees.Company;
-import telran.employees.CompanyImpl;
-import telran.employees.Server;
-import telran.employees.Storage;
+import org.json.JSONObject;
+import telran.employees.*;
 
 import java.io.File;
+import java.io.IOException;
 import java.nio.file.Paths;
 
-public class PlainFileStorage implements Storage, Runnable
+public class PlainFileStorage extends CompanyStorage implements Runnable
 {
     private final String FILE_NAME;
     private final String DIRECTORY_NAME;
-    private final int TIME_INTERVAL = 1 * 60 * 1000;
-    private final Server server;
 
-    public PlainFileStorage(String file_name, String directory_name, Server server)
+    public PlainFileStorage(JSONObject storage_settings, Server server)
     {
-        this.FILE_NAME = file_name;
-        this.DIRECTORY_NAME = directory_name;
-        this.server = server;
+        super(storage_settings, server);
+        this.FILE_NAME = storage_settings.getString("FILE_NAME");
+        this.DIRECTORY_NAME = storage_settings.getString("DIRECTORY_NAME");
     }
 
-    public PlainFileStorage(Server server)
-    {
-        this("employees.data", "CompanyData", server);
-    }
-
-    public String getFilePath()
-    {
+    public String getFilePath() throws IOException {
         String res = null;
-        String projectRoot = Paths.get("").toAbsolutePath().toString();
-        String file_path = Paths.get(projectRoot, DIRECTORY_NAME, FILE_NAME).toString();
+        String project_root = Paths.get("").toAbsolutePath().toString();
+        String file_path = Paths.get(project_root, DIRECTORY_NAME, FILE_NAME).toString();
 
-        File file = new File(file_path);
-        if (file.exists()) {
+        File directory = new File(Paths.get(project_root, DIRECTORY_NAME).toString());
+        boolean mkdir_exists = directory.exists();
+        if (!mkdir_exists) {
+            mkdir_exists = directory.mkdirs();
+        }
+        if (mkdir_exists) {
+            File file = new File(file_path);
+            if (!file.exists()) {
+                file.createNewFile();
+            }
             res = file.getAbsolutePath();
         }
 
@@ -42,16 +41,32 @@ public class PlainFileStorage implements Storage, Runnable
     }
 
     @Override
-    public void save(Company company)
-    {
-        ((CompanyImpl) company).saveToFile(getFilePath());
+    public void save(Company company) {
+        try {
+            String path = getFilePath();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        try {
+            ((CompanyImpl) company).saveToFile(getFilePath());
+            System.out.println("Company saved to the file " + getFilePath());
+        } catch (NullPointerException e) {
+            throw new RuntimeException(e);
+        } catch (RuntimeException | IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
     public Company load()
     {
         Company company = new CompanyImpl();
-        String file_path = getFilePath();
+        String file_path = null;
+        try {
+            file_path = getFilePath();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
         if (file_path != null) {
             ((CompanyImpl) company).restoreFromFile(file_path);
         }
@@ -65,6 +80,7 @@ public class PlainFileStorage implements Storage, Runnable
     @Override
     public void run()
     {
+        System.out.println("Storage Server Started. Chosen type: PlainFile");
         while (true) {
             try {
                 Thread.sleep(TIME_INTERVAL);

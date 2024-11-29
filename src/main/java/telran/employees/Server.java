@@ -1,5 +1,7 @@
 package telran.employees;
 
+import org.json.JSONObject;
+import telran.employees.storages.PlainFileStorage;
 import telran.io.Persistable;
 
 public class Server
@@ -19,6 +21,18 @@ public class Server
     private Server(String storage_type) {
 
         if (this.company instanceof Persistable) {
+            Storage storage = null;
+            try {
+                JSONObject storage_settings = new JSONObject();
+                storage_settings.put("FILE_NAME", "employees.data");
+                storage_settings.put("DIRECTORY_NAME", "CompanyData");
+                storage = new StorageFactory().createStorage(storage_settings, this, storage_type);
+
+                company = storage.load();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
             try {
                 for (int port = PORT_FROM; port <= PORT_TO; port++) {
                     CompanyOperations company_operations = new CompanyOperations(this, port);
@@ -26,8 +40,8 @@ public class Server
                     thread_operations.start();
                 }
 
-                Storage storage = new StorageFactory().createStorage(this, storage_type);
                 Thread thread_storage = new Thread((Runnable) storage);
+                thread_storage.start();
 
                 // FixMe: add shutdown hook to save company to file
 /*
@@ -35,7 +49,6 @@ public class Server
                 saverThread.start();
                 Runtime.getRuntime().addShutdownHook(new Thread(() -> persistable_company.saveToFile(FILE_NAME)));
 */
-                thread_storage.start();
             } catch (Exception e) {
                 e.printStackTrace();
             }

@@ -1,5 +1,4 @@
 package telran.employees;
-import telran.employees.storages.PlainFileStorage;
 import telran.io.Persistable;
 import telran.net.*;
 
@@ -76,8 +75,12 @@ public class CompanyOperations implements Runnable, Protocol
 
         try {
             Company company = server.getCompany();
-            Employee employee = company.getEmployee(Long.getLong(s));
+            Long emlpoyee_id = Long.parseLong(s);
+            CompanySettings.validateEmployeeID(emlpoyee_id);
+            Employee employee = company.getEmployee(emlpoyee_id);
             res = new Response(SUCCESS, employee.toString());
+        } catch (NullPointerException e) {
+            res = new Response(NOT_FOUND, "No data for employee id: " + s);
         } catch (Exception e) {
             res = new Response(INTERNAL_ERROR, e.getMessage());
         }
@@ -97,7 +100,9 @@ public class CompanyOperations implements Runnable, Protocol
 
         try {
             Company company = server.getCompany();
-            company.removeEmployee(Long.getLong(s));
+            Long emlpoyee_id = Long.parseLong(s);
+            CompanySettings.validateEmployeeID(emlpoyee_id);
+            company.removeEmployee(emlpoyee_id);
             res = new Response(SUCCESS, "Employee fired");
             server.setDataChanged(true);
         } catch (Exception e) {
@@ -185,14 +190,6 @@ public class CompanyOperations implements Runnable, Protocol
     {
         if (server.getCompany() instanceof Persistable persistable_company) {
             try {
-                if (server.getCompany() == null) {
-                    server.setCompany(restoreCompany());
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-
-            try {
                 TCPServer tcp_server = new TCPServer(this, this.port);
                 tcp_server.run();
             } catch (Exception e) {
@@ -229,10 +226,5 @@ public class CompanyOperations implements Runnable, Protocol
 
     Response getOkResponse(String responseData) {
         return new Response(ResponseCode.SUCCESS, responseData);
-    }
-
-    private Company restoreCompany()
-    {
-        return new PlainFileStorage(server).load();
     }
 }

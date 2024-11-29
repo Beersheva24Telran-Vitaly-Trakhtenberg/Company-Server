@@ -1,11 +1,17 @@
 package telran.employees;
 
-public class CompanyStorage implements Runnable
-{
-    private final Server server;
+import org.json.JSONObject;
 
-    public CompanyStorage(Server server) {
+public class CompanyStorage implements Storage, Runnable
+{
+    protected final Server server;
+    protected final int TIME_INTERVAL = 1 * 60 * 1000;
+    protected final JSONObject storage_settings;
+
+    public CompanyStorage(JSONObject storage_settings, Server server)
+    {
         this.server = server;
+        this.storage_settings = storage_settings;
     }
 
     /**
@@ -15,5 +21,15 @@ public class CompanyStorage implements Runnable
     public void run()
     {
 
+    }
+
+    @Override
+    public void save(Company company) {
+
+    }
+
+    @Override
+    public Company load() {
+        return null;
     }
 }
