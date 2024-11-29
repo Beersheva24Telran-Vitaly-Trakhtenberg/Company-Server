@@ -19,4 +19,66 @@ public class CompanySettings
     public final static long MAX_SALES = 99999;
     public final static double MIN_FACTOR = 0.1;
     public final static double MAX_FACTOR = 1.0;
+
+    public static void validateEmployeeID(long id) {
+        if (id < MIN_EMPLOYEE_ID || id > MAX_EMPLOYEE_ID) {
+            throw new IllegalArgumentException("Employee ID should be between " + MIN_EMPLOYEE_ID + " and " + MAX_EMPLOYEE_ID);
+        }
+    }
+
+    public static void validateBasicSalary(int salary) {
+        if (salary < MIN_BASIC_SALARY || salary > MAX_BASIC_SALARY) {
+            throw new IllegalArgumentException("Basic salary should be between " + MIN_BASIC_SALARY + " and " + MAX_BASIC_SALARY);
+        }
+    }
+
+    public static void validateEmployeeAge(int age) {
+        if (age < MIN_EMPLOYEE_AGE || age > MAX_EMPLOYEE_AGE) {
+            throw new IllegalArgumentException("Employee age should be between " + MIN_EMPLOYEE_AGE + " and " + MAX_EMPLOYEE_AGE);
+        }
+    }
+
+    public static void validateWage(int wage) {
+        if (wage < MIN_WAGE || wage > MAX_WAGE) {
+            throw new IllegalArgumentException("Wage should be between " + MIN_WAGE + " and " + MAX_WAGE);
+        }
+    }
+
+    public static void validateHours(int hours) {
+        if (hours < MIN_HOURS || hours > MAX_HOURS) {
+            throw new IllegalArgumentException("Hours should be between " + MIN_HOURS + " and " + MAX_HOURS);
+        }
+    }
+
+    public static void validatePercent(float percent) {
+        if (percent < MIN_PERCENT || percent > MAX_PERCENT) {
+            throw new IllegalArgumentException("Percent should be between " + MIN_PERCENT + " and " + MAX_PERCENT);
+        }
+    }
+
+    public static void validateSales(long sales) {
+        if (sales < MIN_SALES || sales > MAX_SALES) {
+            throw new IllegalArgumentException("Sales should be between " + MIN_SALES + " and " + MAX_SALES);
+        }
+    }
+
+    public static void validateFactor(double factor) {
+        if (factor < MIN_FACTOR || factor > MAX_FACTOR) {
+            throw new IllegalArgumentException("Factor should be between " + MIN_FACTOR + " and " + MAX_FACTOR);
+        }
+    }
+
+    public static void validateDepartment(String department) {
+        boolean found = false;
+        for (String dep : DEPARTMENTS) {
+            if (dep.equals(department)) {
+                found = true;
+                break;
+            }
+        }
+        if (!found) {
+            throw new IllegalArgumentException("Unknown department: " + department);
+        }
+    }
+
 }
