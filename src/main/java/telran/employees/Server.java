@@ -1,5 +1,6 @@
 package telran.employees;
 
+import telran.employees.storages.PlainFileStorage;
 import telran.io.Persistable;
 
 public class Server
@@ -19,6 +20,12 @@ public class Server
     private Server(String storage_type) {
 
         if (this.company instanceof Persistable) {
+            try {
+                company = new PlainFileStorage(this).load();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
             try {
                 for (int port = PORT_FROM; port <= PORT_TO; port++) {
                     CompanyOperations company_operations = new CompanyOperations(this, port);

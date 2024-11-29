@@ -62,7 +62,7 @@ public class PlainFileStorage extends CompanyStorage implements Runnable
     }
 
     @Override
-    public Company load()   // FIXME: fix this method
+    public Company load()
     {
         Company company = new CompanyImpl();
         String file_path = null;

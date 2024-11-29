@@ -191,14 +191,6 @@ public class CompanyOperations implements Runnable, Protocol
     {
         if (server.getCompany() instanceof Persistable persistable_company) {
             try {
-                if (server.getCompany() == null) {
-                    server.setCompany(restoreCompany());
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-
-            try {
                 TCPServer tcp_server = new TCPServer(this, this.port);
                 tcp_server.run();
             } catch (Exception e) {
@@ -235,10 +227,5 @@ public class CompanyOperations implements Runnable, Protocol
 
     Response getOkResponse(String responseData) {
         return new Response(ResponseCode.SUCCESS, responseData);
-    }
-
-    private Company restoreCompany()
-    {
-        return new PlainFileStorage(server).load();
     }
 }
