@@ -1,8 +1,9 @@
 package telran.employees;
 
-public class CompanyStorage implements Runnable
+public class CompanyStorage implements Storage, Runnable
 {
-    private final Server server;
+    protected final Server server;
+    protected final int TIME_INTERVAL = 1 * 60 * 1000;
 
     public CompanyStorage(Server server) {
         this.server = server;
@@ -15,5 +16,15 @@ public class CompanyStorage implements Runnable
     public void run()
     {
 
+    }
+
+    @Override
+    public void save(Company company) {
+
+    }
+
+    @Override
+    public Company load() {
+        return null;
     }
 }

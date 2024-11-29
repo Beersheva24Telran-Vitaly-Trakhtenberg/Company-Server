@@ -28,6 +28,7 @@ public class Server
 
                 Storage storage = new StorageFactory().createStorage(this, storage_type);
                 Thread thread_storage = new Thread((Runnable) storage);
+                thread_storage.start();
 
                 // FixMe: add shutdown hook to save company to file
 /*
@@ -35,7 +36,6 @@ public class Server
                 saverThread.start();
                 Runtime.getRuntime().addShutdownHook(new Thread(() -> persistable_company.saveToFile(FILE_NAME)));
 */
-                thread_storage.start();
             } catch (Exception e) {
                 e.printStackTrace();
             }
