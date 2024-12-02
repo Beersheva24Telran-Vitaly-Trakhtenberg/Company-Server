@@ -18,10 +18,11 @@ public class Server
         new Server("file");
     }
 
+    private Storage storage = null;
+
     private Server(String storage_type) {
 
         if (this.company instanceof Persistable) {
-            Storage storage = null;
             try {
                 JSONObject storage_settings = new JSONObject();
                 storage_settings.put("FILE_NAME", "employees.data");
@@ -42,13 +43,9 @@ public class Server
 
                 Thread thread_storage = new Thread((Runnable) storage);
                 thread_storage.start();
-
-                // FixMe: add shutdown hook to save company to file
-/*
-                PersistableSaverThread saverThread = new PersistableSaverThread(persistable_company, FILE_NAME, TIME_INTERVAL);
-                saverThread.start();
-                Runtime.getRuntime().addShutdownHook(new Thread(() -> persistable_company.saveToFile(FILE_NAME)));
-*/
+                Storage finalStorage = storage;
+                Company finalCompany = this.company;
+                Runtime.getRuntime().addShutdownHook(new Thread(() -> finalStorage.save(finalCompany)));
             } catch (Exception e) {
                 e.printStackTrace();
             }
