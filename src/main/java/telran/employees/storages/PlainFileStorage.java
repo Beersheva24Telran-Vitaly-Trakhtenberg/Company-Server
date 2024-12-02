@@ -2,6 +2,7 @@ package telran.employees.storages;
 
 import org.json.JSONObject;
 import telran.employees.*;
+import telran.io.Persistable;
 
 import java.io.File;
 import java.io.IOException;
@@ -48,8 +49,12 @@ public class PlainFileStorage extends CompanyStorage implements Runnable
             throw new RuntimeException(e);
         }
         try {
-            ((CompanyImpl) company).saveToFile(getFilePath());
-            System.out.println("Company saved to the file " + getFilePath());
+            if ((CompanyImpl) company instanceof Persistable) {
+                ((CompanyImpl) company).saveToFile(getFilePath());
+                System.out.println("Company saved to the file " + getFilePath());
+            } else {
+                throw new IllegalArgumentException("Company isn't Persistable");
+            }
         } catch (NullPointerException e) {
             throw new RuntimeException(e);
         } catch (RuntimeException | IOException e) {

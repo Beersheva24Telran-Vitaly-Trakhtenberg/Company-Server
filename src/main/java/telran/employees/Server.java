@@ -1,7 +1,8 @@
 package telran.employees;
 
 import org.json.JSONObject;
-import telran.employees.storages.PlainFileStorage;
+import telran.employees.storages.Storage;
+import telran.employees.storages.StorageFactory;
 import telran.io.Persistable;
 
 public class Server
@@ -20,35 +21,33 @@ public class Server
 
     private Storage storage = null;
 
-    private Server(String storage_type) {
+    private Server(String storage_type)
+    {
+        try {
+            JSONObject storage_settings = new JSONObject();
+            storage_settings.put("FILE_NAME", "employees.data");
+            storage_settings.put("DIRECTORY_NAME", "CompanyData");
+            storage = new StorageFactory().createStorage(storage_settings, this, storage_type);
 
-        if (this.company instanceof Persistable) {
-            try {
-                JSONObject storage_settings = new JSONObject();
-                storage_settings.put("FILE_NAME", "employees.data");
-                storage_settings.put("DIRECTORY_NAME", "CompanyData");
-                storage = new StorageFactory().createStorage(storage_settings, this, storage_type);
+            company = storage.load();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
-                company = storage.load();
-            } catch (Exception e) {
-                e.printStackTrace();
+        try {
+            for (int port = PORT_FROM; port <= PORT_TO; port++) {
+                CompanyOperations company_operations = new CompanyOperations(this, port);
+                Thread thread_operations = new Thread(company_operations);
+                thread_operations.start();
             }
 
-            try {
-                for (int port = PORT_FROM; port <= PORT_TO; port++) {
-                    CompanyOperations company_operations = new CompanyOperations(this, port);
-                    Thread thread_operations = new Thread(company_operations);
-                    thread_operations.start();
-                }
-
-                Thread thread_storage = new Thread((Runnable) storage);
-                thread_storage.start();
-                Storage finalStorage = storage;
-                Company finalCompany = this.company;
-                Runtime.getRuntime().addShutdownHook(new Thread(() -> finalStorage.save(finalCompany)));
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+            Thread thread_storage = new Thread((Runnable) storage);
+            thread_storage.start();
+            Storage finalStorage = storage;
+            Company finalCompany = this.company;
+            Runtime.getRuntime().addShutdownHook(new Thread(() -> finalStorage.save(finalCompany)));
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 
