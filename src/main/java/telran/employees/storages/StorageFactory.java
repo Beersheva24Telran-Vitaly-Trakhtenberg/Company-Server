@@ -1,7 +1,7 @@
-package telran.employees;
+package telran.employees.storages;
 
 import org.json.JSONObject;
-import telran.employees.storages.PlainFileStorage;
+import telran.employees.Server;
 
 public class StorageFactory
 {
@@ -18,6 +18,7 @@ public class StorageFactory
                 storage = new PlainFileStorage(storage_settings, server);
                 break;
             case "sql":
+                storage = new SQLDatabaseStorage(storage_settings, server);
                 break;
             case "nosql":
                 break;
