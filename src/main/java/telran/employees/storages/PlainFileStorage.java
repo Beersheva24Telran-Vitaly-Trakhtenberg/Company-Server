@@ -8,6 +8,8 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Paths;
 
+import static java.lang.Thread.sleep;
+
 public class PlainFileStorage extends CompanyStorage implements Runnable
 {
     private final String FILE_NAME;
@@ -49,7 +51,7 @@ public class PlainFileStorage extends CompanyStorage implements Runnable
             throw new RuntimeException(e);
         }
         try {
-            if ((CompanyImpl) company instanceof Persistable) {
+            if (company instanceof Persistable) {
                 ((CompanyImpl) company).saveToFile(getFilePath());
                 System.out.println("Company saved to the file " + getFilePath());
             } else {
@@ -88,7 +90,7 @@ public class PlainFileStorage extends CompanyStorage implements Runnable
         System.out.println("Storage Server Started. Chosen type: PlainFile");
         while (true) {
             try {
-                Thread.sleep(TIME_INTERVAL);
+                sleep(TIME_INTERVAL);
                 if (server.getDataChanged()) {
                     save(server.getCompany());
                     System.out.println("Company saved to file");

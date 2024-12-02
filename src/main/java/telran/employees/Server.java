@@ -3,7 +3,6 @@ package telran.employees;
 import org.json.JSONObject;
 import telran.employees.storages.Storage;
 import telran.employees.storages.StorageFactory;
-import telran.io.Persistable;
 
 public class Server
 {
@@ -19,15 +18,14 @@ public class Server
         new Server("file");
     }
 
-    private Storage storage = null;
-
     private Server(String storage_type)
     {
+        Storage storage = null;
         try {
             JSONObject storage_settings = new JSONObject();
             storage_settings.put("FILE_NAME", "employees.data");
             storage_settings.put("DIRECTORY_NAME", "CompanyData");
-            storage = new StorageFactory().createStorage(storage_settings, this, storage_type);
+            storage = StorageFactory.createStorage(storage_settings, this, storage_type);
 
             company = storage.load();
         } catch (Exception e) {
