@@ -1,7 +1,8 @@
-package telran.employees;
+package telran.employees.storages;
 
 import org.json.JSONObject;
-import telran.employees.storages.Storage;
+import telran.employees.Company;
+import telran.employees.Server;
 
 public class CompanyStorage implements Storage, Runnable
 {

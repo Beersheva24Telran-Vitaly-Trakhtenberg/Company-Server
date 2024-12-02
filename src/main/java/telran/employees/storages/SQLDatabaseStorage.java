@@ -3,8 +3,6 @@ package telran.employees.storages;
 import org.json.JSONObject;
 import telran.employees.*;
 
-import java.io.IOException;
-
 
 public class SQLDatabaseStorage  extends CompanyStorage implements Runnable
 {
