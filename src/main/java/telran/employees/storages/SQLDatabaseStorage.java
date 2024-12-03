@@ -15,12 +15,12 @@ public class SQLDatabaseStorage  extends CompanyStorage implements Runnable
     }
 
     @Override
-    public void save(Company company) {
+    public synchronized void save(Company company) {
         // TODO save to the database
     }
 
     @Override
-    public Company load() {
+    public synchronized Company load() {
         // TODO restore from the database
         return new CompanyImpl();   // FixMe
     }
@@ -33,6 +33,7 @@ public class SQLDatabaseStorage  extends CompanyStorage implements Runnable
                 Thread.sleep(TIME_INTERVAL);
                 if (server.getDataChanged()) {
                     save(server.getCompany());
+                    server.resetDataChanged();
                     System.out.println("Company saved to database");
                 }
             } catch (InterruptedException e) {

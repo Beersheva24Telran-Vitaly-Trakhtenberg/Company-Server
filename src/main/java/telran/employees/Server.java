@@ -4,6 +4,9 @@ import org.json.JSONObject;
 import telran.employees.storages.Storage;
 import telran.employees.storages.StorageFactory;
 
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
+
 public class Server
 {
     private volatile Company company = new CompanyImpl();
@@ -11,6 +14,7 @@ public class Server
     public final int PORT_FROM = 3500;
     public final int PORT_TO = 3510;
     private volatile boolean data_changed = false;
+    private final Lock lock = new ReentrantLock();
 
 
     public static void main(String[] args)
@@ -49,21 +53,47 @@ public class Server
         }
     }
 
-    public boolean getDataChanged() {
-        return this.data_changed;
+    public boolean getDataChanged()
+    {
+        lock.lock();
+        try {
+            return this.data_changed;
+        } finally {
+            lock.unlock();
+        }
     }
 
     public void setDataChanged(boolean data_changed) {
         this.data_changed = data_changed;
     }
 
+    public void resetDataChanged() {
+        lock.lock();
+        try {
+            this.data_changed = false;
+        } finally {
+            lock.unlock();
+        }
+    }
+
     public Company getCompany()
     {
-        return this.company;
+        lock.lock();
+        try {
+            return this.company;
+        } finally {
+            lock.unlock();
+        }
     }
 
     public void setCompany(Company company)
     {
-        this.company = company;
+        lock.lock();
+        try {
+            this.company = company;
+            this.data_changed = true;
+        } finally {
+            lock.unlock();
+        }
     }
 }

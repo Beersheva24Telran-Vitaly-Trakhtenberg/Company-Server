@@ -44,38 +44,35 @@ public class PlainFileStorage extends CompanyStorage implements Runnable
     }
 
     @Override
-    public void save(Company company) {
-        try {
-            String path = getFilePath();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+    public synchronized void save(Company company) {
         try {
             if (company instanceof Persistable) {
-                ((CompanyImpl) company).saveToFile(getFilePath());
-                System.out.println("Company saved to the file " + getFilePath());
+                String datafile_path;
+                try {
+                    datafile_path = getFilePath();
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+                ((CompanyImpl) company).saveToFile(datafile_path);
+                System.out.println("Company saved to the file " + datafile_path);
             } else {
                 throw new IllegalArgumentException("Company isn't Persistable");
             }
         } catch (NullPointerException e) {
             throw new RuntimeException(e);
-        } catch (RuntimeException | IOException e) {
+        } catch (RuntimeException e) {
             throw new RuntimeException(e);
         }
     }
 
     @Override
-    public Company load()
+    public synchronized Company load()
     {
         Company company = new CompanyImpl();
-        String file_path = null;
         try {
-            file_path = getFilePath();
+            ((CompanyImpl) company).restoreFromFile(getFilePath());
         } catch (IOException e) {
             throw new RuntimeException(e);
-        }
-        if (file_path != null) {
-            ((CompanyImpl) company).restoreFromFile(file_path);
         }
 
         return company;
@@ -90,9 +87,10 @@ public class PlainFileStorage extends CompanyStorage implements Runnable
         System.out.println("Storage Server Started. Chosen type: PlainFile");
         while (true) {
             try {
-                sleep(TIME_INTERVAL);
+                Thread.sleep(TIME_INTERVAL);
                 if (server.getDataChanged()) {
                     save(server.getCompany());
+                    server.resetDataChanged();
                     System.out.println("Company saved to file");
                 }
             } catch (InterruptedException e) {
